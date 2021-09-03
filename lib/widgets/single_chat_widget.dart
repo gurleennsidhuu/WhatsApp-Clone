@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsapp/screens/individual_chat_screen.dart';
 
@@ -38,6 +39,7 @@ class _SingleChatWidgetState extends State<SingleChatWidget> {
                       width: 10,
                     ),
                     Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           widget.name!,

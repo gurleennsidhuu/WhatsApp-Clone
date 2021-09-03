@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:whatsapp/screens/chat_screen.dart';
 import 'package:whatsapp/screens/contact_list.dart';
 import 'package:whatsapp/screens/contact_support.dart';
 import 'package:whatsapp/screens/help_screen.dart';
@@ -54,6 +56,7 @@ Future initCameraController(CameraDescription cameraDescription) async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  Permission.contacts.request();
   availableCameras().then((availableCameras) {
     cameras = availableCameras;
     cameraController = CameraController(
@@ -88,10 +91,10 @@ class MyApp extends StatelessWidget {
           title: TextStyle(color: Colors.white),
         ),
       ),
-      // initialRoute: FirebaseAuth.instance.currentUser != null
-      //     ? ChatScreen.id
-      //     : OpeningScreen.id,
-      initialRoute: ContactSupport.id,
+      initialRoute: FirebaseAuth.instance.currentUser != null
+          ? ChatScreen.id
+          : OpeningScreen.id,
+      //initialRoute: ContactSupport.id,
       routes: {
         OpeningScreen.id: (context) => OpeningScreen(),
         Registration.id: (context) => Registration(),

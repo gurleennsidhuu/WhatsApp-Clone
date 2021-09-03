@@ -2,8 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:whatsapp/constants/color_constants.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:contacts_service/contacts_service.dart';
+import 'package:whatsapp/constants/color_constants.dart';
 import 'package:whatsapp/screens/contact_list.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:whatsapp/widgets/single_chat_widget.dart';
@@ -21,6 +22,15 @@ class UserData {
 }
 
 List<UserData> messages = [];
+
+late Iterable<Contact> contacts;
+
+Future<void> getContacts() async {
+  final Iterable<Contact> contact = await ContactsService.getContacts();
+  // setState(() {
+  contacts = contact;
+  // });
+}
 
 class Messages extends StateNotifier<AsyncValue<List<String>>> {
   Messages() : super(AsyncLoading());
@@ -80,6 +90,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     contactPermission();
+    getContacts();
     Future.wait([context.read(userDataNotifier.notifier).getMessages()]);
     super.initState();
   }

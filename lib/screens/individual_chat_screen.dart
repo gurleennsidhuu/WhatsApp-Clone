@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_bubbles/chat_bubbles.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 
 class IndividualChat extends StatefulWidget {
   static const id = "IndividualChat";
@@ -79,20 +81,133 @@ class _IndividualChatState extends State<IndividualChat> {
             children: [
               Positioned(
                 child: CircleAvatar(
-                  radius: 30,
-                  child: Image.asset("images/default_dp.png"),
+                  radius: 20,
+                  backgroundImage: AssetImage(
+                    "images/default_dp.png",
+                  ),
                 ),
               ),
               SizedBox(
                 width: 8,
               ),
               Positioned(
-                child: Text("name"),
+                left: 50,
+                top: 10,
+                child: Text(
+                  "Name",
+                  style: TextStyle(
+                      fontFamily: 'Helvetica', fontWeight: FontWeight.bold),
+                ),
               ),
             ],
           ),
         ),
-        actions: [],
+        actions: [
+          IconButton(onPressed: () {}, icon: Icon(Icons.videocam)),
+          IconButton(
+              onPressed: () async {
+                FlutterPhoneDirectCaller.callNumber("+917508693437");
+              },
+              icon: Icon(Icons.call)),
+          Theme(
+            data: Theme.of(context).copyWith(
+              iconTheme: IconThemeData(color: Colors.grey),
+            ),
+            child: ListTileTheme(
+              child: PopupMenuButton(onSelected: (value) {
+                switch (value) {
+                  //   case 'New group':
+                  //     {
+                  //       Navigator.pushNamed(context, NewGroupList.id);
+                  //       break;
+                  //     }
+                  //   case 'New broadcast':
+                  //     {
+                  //       Navigator.pushNamed(context, NewBroadcast.id);
+                  //       break;
+                  //     }
+                  //   case 'Linked devices':
+                  //     {
+                  //       Navigator.pushNamed(context, LinkedDevices.id);
+                  //       break;
+                  //     }
+                  //   case 'Starred messages':
+                  //     {
+                  //       Navigator.pushNamed(context, StarredMessages.id);
+                  //       break;
+                  //     }
+                  //   case 'Payments':
+                  //     {
+                  //       Navigator.pushNamed(context, Payments.id);
+                  //       break;
+                  //     }
+                  case 'More':
+                    {
+                      Theme(
+                        data: Theme.of(context).copyWith(
+                          iconTheme: IconThemeData(color: Colors.grey),
+                        ),
+                        child: ListTileTheme(
+                          child: PopupMenuButton(onSelected: (value) {
+                            // switch (value) {
+                            //   case 'Report':
+                            //     {
+                            //       Navigator.pushNamed(context, NewGroupList.id);
+                            //       break;
+                            //     }
+                            //   case 'Block':
+                            //     {
+                            //       Navigator.pushNamed(context, NewBroadcast.id);
+                            //       break;
+                            //     }
+                            //   case 'Clear chat':
+                            //     {
+                            //       Navigator.pushNamed(context, LinkedDevices.id);
+                            //       break;
+                            //     }
+                            //   case 'Export chat':
+                            //     {
+                            //       Navigator.pushNamed(context, StarredMessages.id);
+                            //       break;
+                            //     }
+                            //   case 'Add shortcut':
+                            //     {
+                            //       Navigator.pushNamed(context, Payments.id);
+                            //       break;
+                            //     }
+                            // }
+                          }, itemBuilder: (context) {
+                            return {
+                              'Report',
+                              'Block',
+                              'Clear chat',
+                              'Export chat',
+                              'Add shortcut',
+                            }.map((String choice) {
+                              return PopupMenuItem(
+                                  value: choice, child: Text(choice));
+                            }).toList();
+                          }),
+                        ),
+                      );
+                      break;
+                    }
+                }
+              }, itemBuilder: (context) {
+                return {
+                  'View contact',
+                  'Media, links, and docs',
+                  'Search',
+                  'Mute notifications',
+                  'Wallpaper',
+                  'More'
+                }.map((String choice) {
+                  return PopupMenuItem(value: choice, child: Text(choice));
+                }).toList();
+              }),
+            ),
+          ),
+        ],
       ),
       body: Container(
         child: Column(
@@ -108,6 +223,7 @@ class _IndividualChatState extends State<IndividualChat> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(20.0),
                     child: Container(
+                      width: double.infinity,
                       color: Colors.white,
                       child: Row(
                         children: <Widget>[
@@ -123,7 +239,7 @@ class _IndividualChatState extends State<IndividualChat> {
                             },
                           ),
                           SizedBox(width: 8.0),
-                          Expanded(
+                          Container(
                             child: TextField(
                               decoration: InputDecoration(
                                 hintText: 'Type a message',

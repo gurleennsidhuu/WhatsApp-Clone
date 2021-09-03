@@ -8,6 +8,7 @@ import 'package:whatsapp/constants/color_constants.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:whatsapp/screens/chat_screen.dart';
 import 'package:whatsapp/screens/help_screen.dart';
+import 'package:whatsapp/screens/home_screen.dart';
 import 'package:whatsapp/screens/set_profile_screen.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 import 'package:whatsapp/screens/settings/chats/chats_main.dart';
@@ -191,17 +192,26 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                 verificationId: verificationId, smsCode: _otp);
                         auth
                             .signInWithCredential(_credential)
-                            .then((UserCredential result) {
-                          FirebaseDatabase.instance
+                            .then((UserCredential result) async {
+                          var snapshot = await FirebaseDatabase.instance
                               .reference()
                               .child('User')
                               .child(FirebaseAuth.instance.currentUser!.uid)
-                              .set({
-                            'uid': FirebaseAuth.instance.currentUser!.uid,
-                            'phoneNo':
-                                "${widget.countryCode}${widget.mobileNumber.substring(0, 5) + widget.mobileNumber.substring(6, 11)}"
-                          });
-                          Navigator.pushNamed(context, SetProfile.id);
+                              .once();
+                          if (snapshot.value != null)
+                            Navigator.pushNamed(context, HomeScreen.id);
+                          else {
+                            FirebaseDatabase.instance
+                                .reference()
+                                .child('User')
+                                .child(FirebaseAuth.instance.currentUser!.uid)
+                                .set({
+                              'uid': FirebaseAuth.instance.currentUser!.uid,
+                              'phoneNo':
+                                  "${widget.countryCode}${widget.mobileNumber.substring(0, 5) + widget.mobileNumber.substring(6, 11)}"
+                            });
+                            Navigator.pushNamed(context, SetProfile.id);
+                          }
                         }).catchError((e) {
                           print(e);
                         });

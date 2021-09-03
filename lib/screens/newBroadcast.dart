@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:contacts_service/contacts_service.dart';
+import 'package:whatsapp/screens/chat_screen.dart';
 
 class NewBroadcast extends StatefulWidget {
   static const id = "NewBroadcast";
@@ -11,28 +12,13 @@ class NewBroadcast extends StatefulWidget {
 }
 
 class _NewBroadcastState extends State<NewBroadcast> {
-  late Iterable<Contact> _contacts;
-
-  Future<void> getContacts() async {
-    final Iterable<Contact> contacts = await ContactsService.getContacts();
-    setState(() {
-      _contacts = contacts;
-    });
-  }
-
-  @override
-  void initState() {
-    getContacts();
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [Text('New Broadcast'), Text("${_contacts.length}")],
+          children: [Text('New Broadcast'), Text("${contacts.length}")],
         ),
       ),
       body: Container(
@@ -60,9 +46,9 @@ class _NewBroadcastState extends State<NewBroadcast> {
                   ListView.builder(
                     shrinkWrap: true,
                     physics: ScrollPhysics(),
-                    itemCount: _contacts.length,
+                    itemCount: contacts.length,
                     itemBuilder: (BuildContext context, int index) {
-                      Contact contact = _contacts.elementAt(index);
+                      Contact contact = contacts.elementAt(index);
                       return ListTile(
                         contentPadding: const EdgeInsets.symmetric(
                             vertical: 2, horizontal: 18),

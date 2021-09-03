@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:contacts_service/contacts_service.dart';
+import 'package:whatsapp/screens/chat_screen.dart';
 
 class ContactList extends StatefulWidget {
   static const id = "Contact_list";
@@ -12,19 +13,8 @@ class ContactList extends StatefulWidget {
 }
 
 class _ContactListState extends State<ContactList> {
-  late Iterable<Contact> _contacts;
-
-  Future<void> getContacts() async {
-    print("Hello");
-    final Iterable<Contact> contacts = await ContactsService.getContacts();
-    setState(() {
-      _contacts = contacts;
-    });
-  }
-
   @override
   void initState() {
-    getContacts();
     super.initState();
   }
 
@@ -34,7 +24,7 @@ class _ContactListState extends State<ContactList> {
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [Text('Select contact'), Text("${_contacts.length}")],
+          children: [Text('Select contact'), Text("${contacts.length}")],
         ),
       ),
       body: Container(
@@ -62,9 +52,9 @@ class _ContactListState extends State<ContactList> {
                   ListView.builder(
                     shrinkWrap: true,
                     physics: ScrollPhysics(),
-                    itemCount: _contacts.length,
+                    itemCount: contacts.length,
                     itemBuilder: (BuildContext context, int index) {
-                      Contact contact = _contacts.elementAt(index);
+                      Contact contact = contacts.elementAt(index);
                       return ListTile(
                         contentPadding: const EdgeInsets.symmetric(
                             vertical: 2, horizontal: 18),

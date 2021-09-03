@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsapp/constants/color_constants.dart';
 import 'package:whatsapp/widgets/single_story_widget.dart';
@@ -13,84 +14,91 @@ class _StatusScreenState extends State<StatusScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Scaffold(
-        body: Stack(
-          children: [
-            addStoryButton(),
-            Column(
-              children: [
-                Container(
-                  child: Row(
-                    children: [
-                      Container(
-                        height: 55,
-                        width: 55,
-                        child: Stack(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Image.asset('images/default_dp.png'),
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              Container(
+                child: Row(
+                  children: [
+                    Container(
+                      height: 55,
+                      width: 55,
+                      child: Stack(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.all(
+                                MediaQuery.of(context).size.height * 0.01),
+                            child: CircleAvatar(
+                              backgroundImage:
+                                  AssetImage('images/default_dp.png'),
+                              radius: 35,
                             ),
-                            Positioned(
-                              right: 0,
-                              bottom: 0,
-                              child: Container(
-                                width: 20,
-                                height: 20,
-                                decoration: BoxDecoration(
-                                  color: primaryColor,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Icon(
-                                  Icons.add,
-                                  color: Colors.white,
-                                  size: 15,
-                                ),
+                          ),
+                          Positioned(
+                            right: 0,
+                            bottom: 0,
+                            child: Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                color: primaryColor,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Icon(
+                                Icons.add,
+                                color: Colors.white,
+                                size: 15,
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        width: 12,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'My status',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.w500),
                           ),
-                          SizedBox(
-                            height: 2,
-                          ),
-                          Text("Tap to add status update"),
                         ],
                       ),
-                    ],
-                  ),
+                    ),
+                    SizedBox(
+                      width: 12,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'My status',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.w500),
+                        ),
+                        SizedBox(
+                          height: 2,
+                        ),
+                        Text("Tap to add status update"),
+                      ],
+                    ),
+                  ],
                 ),
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                  ),
-                  child: Text('Recent Updates'),
+              ),
+              Container(
+                width: double.infinity,
+                margin: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.01,
+                  bottom: MediaQuery.of(context).size.height * 0.01,
                 ),
-                SizedBox(
-                  height: 8,
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
                 ),
-                SingleStoryWidget(),
-                SizedBox(
-                  height: 8,
-                ),
-                SingleStoryWidget(),
-              ],
-            )
-          ],
-        ),
+                child: Text('Recent Updates'),
+              ),
+              SizedBox(
+                height: 8,
+              ),
+              SingleStoryWidget(),
+              SizedBox(
+                height: 8,
+              ),
+              SingleStoryWidget(),
+            ],
+          ),
+          addStoryButton(),
+        ],
       ),
     );
   }

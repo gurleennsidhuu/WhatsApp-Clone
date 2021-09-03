@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:contacts_service/contacts_service.dart';
+import 'package:whatsapp/screens/chat_screen.dart';
 
 class NewGroupList extends StatefulWidget {
   static const id = "NewGroup_list";
@@ -11,21 +12,6 @@ class NewGroupList extends StatefulWidget {
 }
 
 class _NewGroupListState extends State<NewGroupList> {
-  Iterable<Contact> _contacts = [];
-
-  Future<void> getContacts() async {
-    final Iterable<Contact> contacts = await ContactsService.getContacts();
-    setState(() {
-      _contacts = contacts;
-    });
-  }
-
-  @override
-  void initState() {
-    getContacts();
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,9 +28,9 @@ class _NewGroupListState extends State<NewGroupList> {
               child: ListView.builder(
                 shrinkWrap: true,
                 physics: ScrollPhysics(),
-                itemCount: _contacts.length,
+                itemCount: contacts.length,
                 itemBuilder: (BuildContext context, int index) {
-                  Contact contact = _contacts.elementAt(index);
+                  Contact contact = contacts.elementAt(index);
                   return ListTile(
                     contentPadding:
                         const EdgeInsets.symmetric(vertical: 2, horizontal: 18),

@@ -14,10 +14,9 @@ class _SingleCallWidgetState extends State<SingleCallWidget> {
       child: Row(
         children: [
           Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Image.asset('images/default_dp.png'),
+            child: CircleAvatar(
+                radius: 25,
+                backgroundImage: AssetImage('images/default_dp.png')),
           ),
           SizedBox(
             width: 2,

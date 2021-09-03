@@ -1,8 +1,41 @@
+import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:whatsapp/main.dart';
 import 'package:whatsapp/screens/displayTakenPicture.dart';
+import 'package:images_picker/images_picker.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:photo_gallery/photo_gallery.dart';
+
+List<Medium> allMedia = [];
+
+class Images extends StateNotifier<AsyncValue<List<Media>>> {
+  Images() : super(AsyncLoading());
+  Future<void> getImage() async {
+    state = AsyncLoading();
+    List<Album>? _albums = await PhotoGallery.listAlbums(
+      mediumType: MediumType.image,
+    );
+    for (int i = 0; i < _albums.length; i++) {
+      MediaPage imagePage = await _albums[i].listMedia(
+        newest: false,
+        skip: 5,
+        take: 10,
+      );
+      allMedia = [
+        ...imagePage.items,
+        //...videoPage.items,
+      ];
+    }
+  }
+}
+
+final imageDataNotifier =
+    StateNotifierProvider<Images, AsyncValue<List<Media>>>((ref) {
+  return Images();
+});
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({Key? key}) : super(key: key);
@@ -15,29 +48,36 @@ class _CameraScreenState extends State<CameraScreen> {
   bool flash = false;
   @override
   initState() {
+    Future.wait([context.read(imageDataNotifier.notifier).getImage()]);
     super.initState();
   }
 
   Widget _buildGalleryBar() {
     final barHeight = 90.0;
     final vertPadding = 10.0;
-    return Container(
-        height: barHeight, // <-- Parent container with height limit
-        child: ListView.builder(
-            // <-- Gallery bar which will scroll horizontally
-            padding: EdgeInsets.symmetric(vertical: vertPadding),
-            scrollDirection: Axis.horizontal,
-            itemBuilder: (BuildContext context, int _) {
-              return Container(
-                  // <-- Each Image
+    return Consumer(builder: (context, watch, child) {
+      final userData = watch(imageDataNotifier);
+      return Container(
+          height: barHeight,
+          child: ListView.builder(
+              padding: EdgeInsets.symmetric(vertical: vertPadding),
+              scrollDirection: Axis.horizontal,
+              itemCount: allMedia.length,
+              itemBuilder: (BuildContext context, int x) {
+                return Container(
                   padding: EdgeInsets.only(right: 5.0),
                   width: 70.0,
                   height: barHeight - vertPadding * 2,
-                  child: Image(
-                    image: AssetImage("images/default_dp.png"),
+                  child: FadeInImage(
                     fit: BoxFit.cover,
-                  ));
-            }));
+                    placeholder: AssetImage('images/default_dp.png'),
+                    image: PhotoProvider(
+                      mediumId: allMedia[x].id,
+                    ),
+                  ),
+                );
+              }));
+    });
   }
 
   _buildControlBar() {

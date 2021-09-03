@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:whatsapp/screens/calls_screen.dart';
 import 'package:whatsapp/screens/camera_screen.dart';
 import 'package:whatsapp/screens/chat_screen.dart';
 import 'package:camera/camera.dart';
@@ -9,6 +10,7 @@ import 'package:whatsapp/screens/newGroup.dart';
 import 'package:whatsapp/screens/payments.dart';
 import 'package:whatsapp/screens/settings/main_setting_screen.dart';
 import 'package:whatsapp/screens/starredMessages.dart';
+import 'package:whatsapp/screens/status_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   static const id = 'chat_screen';
@@ -127,7 +129,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         body: TabBarView(
-          children: [CameraScreen(), ChatScreen(), Container(), Container()],
+          children: [
+            CameraScreen(),
+            ChatScreen(),
+            StatusScreen(),
+            CallsScreen()
+          ],
         ),
       ),
     );
