@@ -1,19 +1,18 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:otp_text_field/style.dart';
 import 'package:whatsapp/constants/color_constants.dart';
-import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:whatsapp/screens/chat_screen.dart';
 import 'package:whatsapp/screens/help_screen.dart';
 import 'package:whatsapp/screens/home_screen.dart';
 import 'package:whatsapp/screens/set_profile_screen.dart';
-import 'package:pinput/pin_put/pin_put.dart';
-import 'package:whatsapp/screens/settings/chats/chats_main.dart';
 import 'package:whatsapp/services/authservices.dart';
-import 'package:pinput/pin_put/pin_put_state.dart';
+import 'package:otp_text_field/otp_text_field.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class VerificationScreen extends StatefulWidget {
   static const id = 'verification';
@@ -26,10 +25,13 @@ class VerificationScreen extends StatefulWidget {
 }
 
 String _otp = "";
+int? resendToken;
+int _start = 10;
 TextEditingController _pincodeController = new TextEditingController();
 
 class _VerificationScreenState extends State<VerificationScreen> {
   late String verificationId, smsCode;
+  late Timer _timer;
   bool codeSent = false;
 
   BoxDecoration get _pinPutDecoration {
@@ -39,6 +41,24 @@ class _VerificationScreenState extends State<VerificationScreen> {
             width: MediaQuery.of(context).size.height * 0.002,
             color: Colors.grey),
       ),
+    );
+  }
+
+  void startTimer() {
+    const oneSec = const Duration(seconds: 1);
+    _timer = new Timer.periodic(
+      oneSec,
+      (Timer timer) {
+        if (_start == 0) {
+          setState(() {
+            timer.cancel();
+          });
+        } else {
+          setState(() {
+            _start--;
+          });
+        }
+      },
     );
   }
 
@@ -56,6 +76,8 @@ class _VerificationScreenState extends State<VerificationScreen> {
       this.verificationId = verId;
       setState(() {
         this.codeSent = true;
+        startTimer();
+        resendToken = forceResend!;
       });
     };
 
@@ -69,7 +91,8 @@ class _VerificationScreenState extends State<VerificationScreen> {
         verificationCompleted: verified,
         verificationFailed: verificationfailed,
         codeSent: smsSent,
-        codeAutoRetrievalTimeout: autoTimeout);
+        codeAutoRetrievalTimeout: autoTimeout,
+        forceResendingToken: resendToken);
   }
 
   random(min, max) {
@@ -88,8 +111,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
 
   @override
   void initState() {
-    // smsCode = random(100000, 999999).toString();
-    // AuthService().signInWithOTP(smsCode, verificationId);
     verifyPhone(
         "+${widget.countryCode}${widget.mobileNumber.substring(0, 5) + widget.mobileNumber.substring(6, 11)}");
     super.initState();
@@ -174,48 +195,50 @@ class _VerificationScreenState extends State<VerificationScreen> {
                 Container(
                   margin:
                       EdgeInsets.all(MediaQuery.of(context).size.height * 0.03),
-                  // child: PinPut(
-                  //   fieldsCount: 6,
-                  //   focusNode: _pinPutFocusNode,
-                  //   controller: _pinPutController,
-                  //   selectedFieldDecoration: _pinPutDecoration,
-                  //   followingFieldDecoration: _pinPutDecoration,
-                  // ),
-                  child: TextField(
-                    maxLength: 6,
-                    onChanged: (value) {
-                      _otp = value;
-                      if (_otp.length == 6) {
-                        FirebaseAuth auth = FirebaseAuth.instance;
-                        AuthCredential _credential =
-                            PhoneAuthProvider.credential(
-                                verificationId: verificationId, smsCode: _otp);
-                        auth
-                            .signInWithCredential(_credential)
-                            .then((UserCredential result) async {
-                          var snapshot = await FirebaseDatabase.instance
+                  child: OTPTextField(
+                    length: 6,
+                    width: MediaQuery.of(context).size.width,
+                    fieldWidth: 40,
+                    style: TextStyle(fontSize: 17),
+                    textFieldAlignment: MainAxisAlignment.spaceAround,
+                    fieldStyle: FieldStyle.underline,
+                    onCompleted: (pin) {
+                      _otp = pin;
+                      FirebaseAuth auth = FirebaseAuth.instance;
+                      AuthCredential _credential = PhoneAuthProvider.credential(
+                          verificationId: verificationId, smsCode: pin);
+                      auth
+                          .signInWithCredential(_credential)
+                          .then((UserCredential result) async {
+                        var snapshot = await FirebaseDatabase.instance
+                            .reference()
+                            .child('User')
+                            .child(FirebaseAuth.instance.currentUser!.uid)
+                            .once();
+                        if (snapshot.value != null)
+                          Navigator.pushNamed(context, HomeScreen.id);
+                        else {
+                          FirebaseDatabase.instance
                               .reference()
                               .child('User')
                               .child(FirebaseAuth.instance.currentUser!.uid)
-                              .once();
-                          if (snapshot.value != null)
-                            Navigator.pushNamed(context, HomeScreen.id);
-                          else {
-                            FirebaseDatabase.instance
-                                .reference()
-                                .child('User')
-                                .child(FirebaseAuth.instance.currentUser!.uid)
-                                .set({
-                              'uid': FirebaseAuth.instance.currentUser!.uid,
-                              'phoneNo':
-                                  "${widget.countryCode}${widget.mobileNumber.substring(0, 5) + widget.mobileNumber.substring(6, 11)}"
-                            });
-                            Navigator.pushNamed(context, SetProfile.id);
-                          }
-                        }).catchError((e) {
-                          print(e);
-                        });
-                      }
+                              .set({
+                            'uid': FirebaseAuth.instance.currentUser!.uid,
+                            'phoneNo':
+                                "${widget.countryCode}${widget.mobileNumber.substring(0, 5) + widget.mobileNumber.substring(6, 11)}"
+                          });
+                          Navigator.pushNamed(context, SetProfile.id);
+                        }
+                      }).catchError((e) {
+                        Fluttertoast.showToast(
+                            msg: "Incorrect OTP",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.CENTER,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                            fontSize: 16.0);
+                      });
                     },
                   ),
                 ),
@@ -230,25 +253,38 @@ class _VerificationScreenState extends State<VerificationScreen> {
                 Container(
                   margin: EdgeInsets.all(
                       MediaQuery.of(context).size.height * 0.015),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.sms,
-                        color: textColor,
-                        size: MediaQuery.of(context).size.height * 0.033,
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.03,
-                      ),
-                      Text(
-                        'Resend SMS',
-                        style: TextStyle(
-                          color: textColor,
-                          fontSize: MediaQuery.of(context).size.height * 0.021,
-                          fontWeight: FontWeight.w500,
+                  child: GestureDetector(
+                    onTap: () {
+                      verifyPhone(
+                          "+${widget.countryCode}${widget.mobileNumber.substring(0, 5) + widget.mobileNumber.substring(6, 11)}");
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.sms,
+                              color: textColor,
+                              size: MediaQuery.of(context).size.height * 0.033,
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.03,
+                            ),
+                            Text(
+                              'Resend SMS',
+                              style: TextStyle(
+                                color: textColor,
+                                fontSize:
+                                    MediaQuery.of(context).size.height * 0.021,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
-                      )
-                    ],
+                        Text("$_start"),
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(
@@ -289,7 +325,42 @@ class _VerificationScreenState extends State<VerificationScreen> {
             Spacer(),
             ElevatedButton(
               onPressed: () {
-                if (_otp.length == 6) {}
+                if (_otp.length == 6) {
+                  AuthCredential _credential = PhoneAuthProvider.credential(
+                      verificationId: verificationId, smsCode: _otp);
+                  FirebaseAuth.instance
+                      .signInWithCredential(_credential)
+                      .then((UserCredential result) async {
+                    var snapshot = await FirebaseDatabase.instance
+                        .reference()
+                        .child('User')
+                        .child(FirebaseAuth.instance.currentUser!.uid)
+                        .once();
+                    if (snapshot.value != null)
+                      Navigator.pushNamed(context, HomeScreen.id);
+                    else {
+                      FirebaseDatabase.instance
+                          .reference()
+                          .child('User')
+                          .child(FirebaseAuth.instance.currentUser!.uid)
+                          .set({
+                        'uid': FirebaseAuth.instance.currentUser!.uid,
+                        'phoneNo':
+                            "${widget.countryCode}${widget.mobileNumber.substring(0, 5) + widget.mobileNumber.substring(6, 11)}"
+                      });
+                      Navigator.pushNamed(context, SetProfile.id);
+                    }
+                  }).catchError((e) {
+                    Fluttertoast.showToast(
+                        msg: "Incorrect OTP",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: Colors.red,
+                        textColor: Colors.white,
+                        fontSize: 16.0);
+                  });
+                }
               },
               child: Text(
                 'NEXT',

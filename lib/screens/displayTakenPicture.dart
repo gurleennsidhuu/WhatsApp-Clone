@@ -2,12 +2,16 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class DisplayPictureScreen extends StatelessWidget {
+class DisplayPictureScreen extends StatefulWidget {
   final String imagePath;
-
   const DisplayPictureScreen({Key? key, required this.imagePath})
       : super(key: key);
 
+  @override
+  _DisplayPictureScreenState createState() => _DisplayPictureScreenState();
+}
+
+class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +28,7 @@ class DisplayPictureScreen extends StatelessWidget {
       body: Container(
         width: double.infinity,
         child: Image.file(
-          File(imagePath),
+          File(widget.imagePath),
           fit: BoxFit.fitWidth,
         ),
       ),

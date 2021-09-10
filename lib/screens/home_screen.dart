@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:whatsapp/screens/calls_screen.dart';
 import 'package:whatsapp/screens/camera_screen.dart';
 import 'package:whatsapp/screens/chat_screen.dart';
-import 'package:camera/camera.dart';
 import 'package:whatsapp/screens/linkedDevices.dart';
 import 'package:whatsapp/screens/newBroadcast.dart';
 import 'package:whatsapp/screens/newGroup.dart';
@@ -30,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
       length: 4,
       child: Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

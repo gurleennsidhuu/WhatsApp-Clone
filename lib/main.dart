@@ -35,6 +35,7 @@ import 'package:whatsapp/screens/settings/notifications/notification_main.dart';
 import 'package:whatsapp/screens/settings/storage_and_data/storage_and_data_main.dart';
 import 'package:whatsapp/screens/starredMessages.dart';
 import 'package:whatsapp/screens/testScreen.dart';
+import 'package:whatsapp/screens/user_details_screen.dart';
 
 late final CameraController cameraController;
 List<CameraDescription> cameras = [];
@@ -125,7 +126,8 @@ class MyApp extends StatelessWidget {
         LinkedDevices.id: (context) => LinkedDevices(),
         StarredMessages.id: (context) => StarredMessages(),
         Payments.id: (context) => Payments(),
-        TestChat.id: (context) => TestChat(userId: "aplk")
+        TestChat.id: (context) => TestChat(userId: "aplk"),
+        UserDetails.id: (context) => UserDetails()
       },
     );
   }
