@@ -144,21 +144,21 @@ class _RegistrationState extends State<Registration> {
                                       if (!await Permission.phone.isGranted) {
                                         openAppSettings();
                                       }
-                                      // if (await Permission.phone.isGranted) {
-                                      //   final String? mobileNumber =
-                                      //       await MobileNumber.mobileNumber;
-                                      //   if (mobileNumber == null) {
-                                      //     Fluttertoast.showToast(
-                                      //         msg:
-                                      //             "SIM not found. Please check that you have a SIM on your device or type in your number",
-                                      //         toastLength: Toast.LENGTH_SHORT,
-                                      //         gravity: ToastGravity.BOTTOM,
-                                      //         timeInSecForIosWeb: 2,
-                                      //         backgroundColor: Colors.grey,
-                                      //         textColor: Colors.black,
-                                      //         fontSize: 16.0);
-                                      //   }
-                                      // }
+                                      if (await Permission.phone.isGranted) {
+                                        final String? mobileNumber =
+                                            await MobileNumber.mobileNumber;
+                                        if (mobileNumber == null) {
+                                          Fluttertoast.showToast(
+                                              msg:
+                                                  "SIM not found. Please check that you have a SIM on your device or type in your number",
+                                              toastLength: Toast.LENGTH_SHORT,
+                                              gravity: ToastGravity.BOTTOM,
+                                              timeInSecForIosWeb: 2,
+                                              backgroundColor: Colors.grey,
+                                              textColor: Colors.black,
+                                              fontSize: 16.0);
+                                        }
+                                      }
                                     },
                                     child: Text(
                                       'SETTINGS',
