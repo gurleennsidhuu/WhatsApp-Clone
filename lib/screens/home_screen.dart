@@ -1,3 +1,4 @@
+import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsapp/screens/calls_screen.dart';
@@ -11,6 +12,57 @@ import 'package:whatsapp/screens/settings/main_setting_screen.dart';
 import 'package:whatsapp/screens/starredMessages.dart';
 import 'package:whatsapp/screens/status_screen.dart';
 
+late List<Contact> contacts;
+
+Future<void> getContacts() async {
+  final Iterable<Contact> contact = await ContactsService.getContacts();
+  // setState(() {
+  contacts = contact.toList();
+  // });
+}
+
+class CustomDelegate extends SearchDelegate<String> {
+  @override
+  List<Widget> buildActions(BuildContext context) =>
+      [IconButton(icon: Icon(Icons.clear), onPressed: () => query = '')];
+
+  @override
+  Widget buildLeading(BuildContext context) => IconButton(
+      icon: Icon(Icons.chevron_left), onPressed: () => close(context, ''));
+
+  @override
+  Widget buildResults(BuildContext context) => Container();
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    var listToShow;
+    if (query.isNotEmpty)
+      listToShow = contacts
+          .where((e) =>
+              e.displayName!.contains(query) &&
+              e.displayName!.startsWith(query))
+          .toList();
+    else
+      listToShow = contacts;
+
+    return ListView.builder(
+      itemCount: listToShow.length,
+      itemBuilder: (_, i) {
+        var noun = listToShow[i].displayName;
+        return ListTile(
+          title: Text(
+            noun,
+            style: TextStyle(
+              color: Colors.black,
+            ),
+          ),
+          onTap: () => close(context, noun),
+        );
+      },
+    );
+  }
+}
+
 class HomeScreen extends StatefulWidget {
   static const id = 'chat_screen';
   const HomeScreen({Key? key}) : super(key: key);
@@ -21,6 +73,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String searchString = '';
+
+  @override
+  void initState() {
+    getContacts();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +101,9 @@ class _HomeScreenState extends State<HomeScreen> {
               Row(
                 children: [
                   GestureDetector(
+                    onTap: () {
+                      showSearch(context: context, delegate: CustomDelegate());
+                    },
                     child: Icon(
                       Icons.search,
                       color: Colors.white,

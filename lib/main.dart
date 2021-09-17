@@ -17,6 +17,7 @@ import 'package:whatsapp/screens/newGroup.dart';
 import 'package:whatsapp/screens/opening_screen.dart';
 import 'package:whatsapp/screens/payments.dart';
 import 'package:whatsapp/screens/registration_screen.dart';
+import 'package:whatsapp/screens/search_help_centre.dart';
 import 'package:whatsapp/screens/set_profile_screen.dart';
 import 'package:whatsapp/screens/settings/account/account_settings.dart';
 import 'package:whatsapp/screens/settings/account/change_number.dart';
@@ -36,6 +37,7 @@ import 'package:whatsapp/screens/settings/storage_and_data/storage_and_data_main
 import 'package:whatsapp/screens/starredMessages.dart';
 import 'package:whatsapp/screens/testScreen.dart';
 import 'package:whatsapp/screens/user_details_screen.dart';
+import 'package:whatsapp/screens/verification_screen.dart';
 
 late final CameraController cameraController;
 List<CameraDescription> cameras = [];
@@ -92,10 +94,10 @@ class MyApp extends StatelessWidget {
           title: TextStyle(color: Colors.white),
         ),
       ),
-      initialRoute: FirebaseAuth.instance.currentUser != null
-          ? ChatScreen.id
-          : OpeningScreen.id,
-      //initialRoute: ContactSupport.id,
+      // initialRoute: FirebaseAuth.instance.currentUser != null
+      //     ? ChatScreen.id
+      //     : OpeningScreen.id,
+      initialRoute: HelpCentre.id,
       routes: {
         OpeningScreen.id: (context) => OpeningScreen(),
         Registration.id: (context) => Registration(),
@@ -127,7 +129,8 @@ class MyApp extends StatelessWidget {
         StarredMessages.id: (context) => StarredMessages(),
         Payments.id: (context) => Payments(),
         TestChat.id: (context) => TestChat(userId: "aplk"),
-        UserDetails.id: (context) => UserDetails()
+        UserDetails.id: (context) => UserDetails(),
+        HelpCentre.id: (context) => HelpCentre(),
       },
     );
   }

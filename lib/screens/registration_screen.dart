@@ -1,18 +1,14 @@
 import 'package:country_pickers/country.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:country_pickers/country_pickers.dart';
 import 'package:whatsapp/constants/color_constants.dart';
-import 'package:whatsapp/screens/country_picker.dart';
 import 'package:whatsapp/screens/help_screen.dart';
 import 'package:whatsapp/screens/verification_screen.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:mobile_number/mobile_number.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:country_picker/country_picker.dart';
 
 class Registration extends StatefulWidget {
   static const id = 'verification_screen';
@@ -23,12 +19,62 @@ class Registration extends StatefulWidget {
 }
 
 class _RegistrationState extends State<Registration> {
-  //Country _countryPicker = CountryPickerUtils.getCountryByPhoneCode("91");
-  String _countryCode = "";
+  static Country _selectedFilteredDialogCountry =
+      CountryPickerUtils.getCountryByPhoneCode("92");
+  String _countryCode = _selectedFilteredDialogCountry.phoneCode;
   String mobileNumber = "";
   TextEditingController phone = TextEditingController();
-
   late final selectedCountry;
+
+  void _openFilteredCountryPickerDialog() {
+    showDialog(
+        context: context,
+        builder: (_) => Theme(
+              data: Theme.of(context).copyWith(
+                primaryColor: primaryColor,
+              ),
+              child: CountryPickerDialog(
+                titlePadding: EdgeInsets.all(8.0),
+                searchCursorColor: Colors.black,
+                searchInputDecoration: InputDecoration(
+                  hintText: "Search",
+                ),
+                isSearchable: true,
+                title: Text("Select your phone code"),
+                onValuePicked: (Country country) {
+                  setState(() {
+                    _selectedFilteredDialogCountry = country;
+                    _countryCode = country.phoneCode;
+                  });
+                },
+                itemBuilder: _buildDialogItem,
+              ),
+            ));
+  }
+
+  Widget _buildDialogItem(Country country) {
+    return Container(
+      height: 40,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: greenColor, width: 1),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          CountryPickerUtils.getDefaultFlagImage(country),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.01,
+          ),
+          Spacer(),
+          Text("${country.name}"),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -185,48 +231,26 @@ class _RegistrationState extends State<Registration> {
                   ),
                 ),
                 ListTile(
-                  onTap: () {
-                    Navigator.pushNamed(context, HomePage.id);
-                  },
-                  //title: country,
+                  onTap: _openFilteredCountryPickerDialog,
+                  title: _buildDialogItem(_selectedFilteredDialogCountry),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      // alignment: Alignment.center,
+                      alignment: Alignment.center,
                       decoration: BoxDecoration(
                         border: Border(
                             bottom: BorderSide(width: 1.5, color: greenColor)),
                       ),
                       height: 40,
                       width: 70,
-                      child: TextField(
-                        maxLength: 3,
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.only(bottom: 9),
-                          focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(width: 2, color: greenColor),
-                          ),
-                          counterText: "",
-                          prefixIconConstraints: BoxConstraints(
-                            minWidth: 25,
-                            minHeight: 25,
-                          ),
-                          prefixIcon: SizedBox(
-                            child: Text(
-                              '+',
-                              style: TextStyle(
-                                  color: Colors.grey[700],
-                                  fontSize: MediaQuery.of(context).size.height *
-                                      0.023),
-                            ),
-                          ),
-                        ),
-                        keyboardType: TextInputType.number,
-                        onChanged: (value) async {
-                          _countryCode = value;
-                        },
+                      child: Text(
+                        "+$_countryCode",
+                        style: TextStyle(
+                            color: Colors.grey[700],
+                            fontSize:
+                                MediaQuery.of(context).size.height * 0.02),
                       ),
                     ),
                     SizedBox(
@@ -352,6 +376,7 @@ class _RegistrationState extends State<Registration> {
                     title: Text(
                       'You entered the phone number:',
                       style: TextStyle(
+                          color: Colors.black,
                           fontWeight: FontWeight.normal,
                           fontSize: MediaQuery.of(context).size.height * 0.02),
                     ),
@@ -399,6 +424,7 @@ class _RegistrationState extends State<Registration> {
                           ),
                           TextButton(
                             onPressed: () {
+                              Navigator.pop(context, true);
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(

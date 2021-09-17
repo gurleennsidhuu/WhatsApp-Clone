@@ -25,6 +25,7 @@ late XFile image3;
 bool found1 = false;
 bool found2 = false;
 bool found3 = false;
+bool next = false;
 
 class _ContactSupportState extends State<ContactSupport> {
   @override
@@ -53,6 +54,17 @@ class _ContactSupportState extends State<ContactSupport> {
                   minLines: 6,
                   keyboardType: TextInputType.multiline,
                   maxLines: null,
+                  onChanged: (String text) {
+                    if (text.length >= 30) {
+                      setState(() {
+                        next = true;
+                      });
+                    } else {
+                      setState(() {
+                        next = false;
+                      });
+                    }
+                  },
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.025),
                 Text(
@@ -203,10 +215,10 @@ class _ContactSupportState extends State<ContactSupport> {
                     padding: EdgeInsets.all(
                         MediaQuery.of(context).size.height * 0.02),
                   ),
-                  onPressed: complaint.text.length == 0
+                  onPressed: !next
                       ? null
                       : () {
-                          if (complaint.text.length < 30) {
+                          if (complaint.text.length < 1) {
                             setState(() {
                               validate = true;
                             });

@@ -24,6 +24,23 @@ class _NewBroadcastState extends State<NewBroadcast> {
       body: Container(
         child: Column(
           children: [
+            Container(
+              alignment: Alignment.center,
+              margin: EdgeInsets.all(MediaQuery.of(context).size.height * 0.02),
+              child: Text(
+                'Only contacts with +91 75086 93437 in their address book will receive your broadcast messages.',
+                style: TextStyle(
+                    fontSize: MediaQuery.of(context).size.height * 0.018,
+                    fontWeight: FontWeight.w400),
+              ),
+            ),
+            // SizedBox(
+            //   width: double.infinity,
+            //   height: MediaQuery.of(context).size.height * 0.02,
+            // ),
+            Divider(
+              color: Colors.black,
+            ),
             Expanded(
               child: ListView(
                 children: [

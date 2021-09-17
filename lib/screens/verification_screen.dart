@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,6 +12,7 @@ import 'package:whatsapp/screens/set_profile_screen.dart';
 import 'package:whatsapp/services/authservices.dart';
 import 'package:otp_text_field/otp_text_field.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 
 class VerificationScreen extends StatefulWidget {
   static const id = 'verification';
@@ -25,37 +25,33 @@ class VerificationScreen extends StatefulWidget {
 }
 
 String _otp = "";
-int? resendToken;
-int _start = 10;
+int resendToken = 0;
+int _sec = 2;
+int _min = 1;
 TextEditingController _pincodeController = new TextEditingController();
+NumberFormat formatter = new NumberFormat("00");
 
 class _VerificationScreenState extends State<VerificationScreen> {
   late String verificationId, smsCode;
   late Timer _timer;
   bool codeSent = false;
 
-  BoxDecoration get _pinPutDecoration {
-    return BoxDecoration(
-      border: Border(
-        bottom: BorderSide(
-            width: MediaQuery.of(context).size.height * 0.002,
-            color: Colors.grey),
-      ),
-    );
-  }
-
   void startTimer() {
     const oneSec = const Duration(seconds: 1);
     _timer = new Timer.periodic(
       oneSec,
       (Timer timer) {
-        if (_start == 0) {
+        if (_min == 0 && _sec == 0) {
           setState(() {
             timer.cancel();
           });
         } else {
           setState(() {
-            _start--;
+            _sec--;
+            if (_sec == 0) {
+              if (_min != 0) _sec = 59;
+              if (_min > 0) _min--;
+            }
           });
         }
       },
@@ -95,14 +91,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
         forceResendingToken: resendToken);
   }
 
-  random(min, max) {
-    var rn = new Random();
-    return min + rn.nextInt(max - min);
-  }
-
-  final TextEditingController _pinPutController = TextEditingController();
-  final FocusNode _pinPutFocusNode = FocusNode();
-
   @override
   void dispose() {
     _pincodeController.dispose();
@@ -111,6 +99,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
 
   @override
   void initState() {
+    print("${formatter.format(_min)} : ${formatter.format(_sec)}");
     verifyPhone(
         "+${widget.countryCode}${widget.mobileNumber.substring(0, 5) + widget.mobileNumber.substring(6, 11)}");
     super.initState();
@@ -253,37 +242,46 @@ class _VerificationScreenState extends State<VerificationScreen> {
                 Container(
                   margin: EdgeInsets.all(
                       MediaQuery.of(context).size.height * 0.015),
-                  child: GestureDetector(
-                    onTap: () {
-                      verifyPhone(
-                          "+${widget.countryCode}${widget.mobileNumber.substring(0, 5) + widget.mobileNumber.substring(6, 11)}");
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.sms,
-                              color: textColor,
-                              size: MediaQuery.of(context).size.height * 0.033,
-                            ),
-                            SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.03,
-                            ),
-                            Text(
-                              'Resend SMS',
-                              style: TextStyle(
-                                color: textColor,
-                                fontSize:
-                                    MediaQuery.of(context).size.height * 0.021,
-                                fontWeight: FontWeight.w500,
+                  child: AbsorbPointer(
+                    absorbing: _min == 0 && _sec == 0,
+                    child: GestureDetector(
+                      onTap: () {
+                        verifyPhone(
+                            "+${widget.countryCode}${widget.mobileNumber.substring(0, 5) + widget.mobileNumber.substring(6, 11)}");
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.sms,
+                                color: _min == 0 && _sec == 0
+                                    ? textColor
+                                    : Color(0xFFA2C8B6),
+                                size:
+                                    MediaQuery.of(context).size.height * 0.033,
                               ),
-                            ),
-                          ],
-                        ),
-                        Text("$_start"),
-                      ],
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.03,
+                              ),
+                              Text(
+                                'Resend SMS',
+                                style: TextStyle(
+                                  color: _min == 0 && _sec == 0
+                                      ? textColor
+                                      : Color(0xFFA2C8B6),
+                                  fontSize: MediaQuery.of(context).size.height *
+                                      0.021,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Text(
+                              "${formatter.format(_min)} : ${formatter.format(_sec)}"),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -303,7 +301,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     children: [
                       Icon(
                         Icons.call,
-                        color: textColor,
+                        color: _min == 0 && _sec == 0
+                            ? textColor
+                            : Color(0xFFA2C8B6),
                         size: MediaQuery.of(context).size.height * 0.033,
                       ),
                       SizedBox(
@@ -312,7 +312,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
                       Text(
                         'Call me',
                         style: TextStyle(
-                          color: textColor,
+                          color: _min == 0 && _sec == 0
+                              ? textColor
+                              : Color(0xFFA2C8B6),
                           fontSize: MediaQuery.of(context).size.height * 0.021,
                           fontWeight: FontWeight.w500,
                         ),

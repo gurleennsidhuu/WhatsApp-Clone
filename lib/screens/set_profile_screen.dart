@@ -19,7 +19,7 @@ class _SetProfileState extends State<SetProfile> {
   TextEditingController _userNameController = new TextEditingController();
   String userName = "";
   final ImagePicker _picker = ImagePicker();
-  late XFile userDp;
+  XFile? userDp;
   bool emojiShowing = false;
 
   _onEmojiSelected(Emoji emoji) {
@@ -62,9 +62,15 @@ class _SetProfileState extends State<SetProfile> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.01,
+                    ),
                     Text(
                       'Please provide your name and an option photo.',
                       //style: Text,
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.02,
                     ),
                     Row(
                       children: [
@@ -81,7 +87,7 @@ class _SetProfileState extends State<SetProfile> {
                                     source: ImageSource.gallery))!;
                               } else
                                 Permission.photos.request();
-                              print(userDp.path);
+                              print(userDp!.path);
                             },
                           ),
                         ),
@@ -128,7 +134,7 @@ class _SetProfileState extends State<SetProfile> {
                             .set({
                           'uid': FirebaseAuth.instance.currentUser!.uid,
                           'name': userName,
-                          'photoUrl': userDp.path,
+                          'photoUrl': userDp == null ? "default" : userDp!.path,
                           'bio': 'Hey there, I am using WhatsApp'
                         });
                         Navigator.pushNamed(context, HomeScreen.id);
